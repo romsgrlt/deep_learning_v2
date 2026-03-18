@@ -42,8 +42,8 @@ def main():
 
     dro_loss = GroupDROLoss(n_groups=4).to(device) if enable_DRO else None
 
-    train_logger = CSVLogger('./logs/train.csv', len(labels))
-    val_logger = CSVLogger('./logs/val.csv', len(labels))
+    train_logger = CSVLogger('./logs/train.csv')
+    val_logger = CSVLogger('./logs/val.csv')
 
     for n in range(n_epoch):
         print(f"\nEpoch [{n}]")

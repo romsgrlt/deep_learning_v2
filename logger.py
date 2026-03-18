@@ -1,19 +1,20 @@
 import csv
+from dataset import labels
 
 
 class CSVLogger:
-    def __init__(self, path, n_groups):
+    def __init__(self, path):
         self.file = open(path, 'w')
 
         columns = ['epoch']
-        for g in range(n_groups):
+        for label in labels:
             columns += [
-                f'loss_group_{g}',
-                f'acc_group_{g}',
-                f'adv_prob_group_{g}',
-                f'n_group_{g}',
+                f'loss_group_{label}',
+                f'accuracy_group_{label}',
+                f'adv_prob_group_{label}',
+                f'n_{label}',
             ]
-        columns += ['avg_loss', 'avg_acc', 'worst_group_acc']
+        columns += ['avg_loss', 'avg_accuracy', 'worst_group_accuracy']
 
         self.writer = csv.DictWriter(self.file, fieldnames=columns)
         self.writer.writeheader()
