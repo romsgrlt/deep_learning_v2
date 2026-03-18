@@ -15,6 +15,8 @@ transform_eval = transforms.Compose([
 ])
 
 
+labels = ['landbird/land', 'landbird/water', 'waterbird/land', 'waterbird/water']
+
 def load_metadata():
     metadata = pd.read_csv('data/metadata.csv')
     y_array = metadata['y'].values
