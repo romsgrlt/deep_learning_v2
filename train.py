@@ -46,7 +46,7 @@ def run(loader, model, criterion, is_training, loss_dro, optimizer=None):
                 loss.backward()
                 optimizer.step()
 
-            correct, total = eval_groups(output.detach().cpu(), y.cpu(), group)
+            correct, total = eval_groups(output.detach().cpu(), y.cpu(), group.cpu())
             correct_per_group += correct
             total_per_group += total
 
