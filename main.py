@@ -7,6 +7,7 @@ import torch
 from dro import GroupDROLoss
 from logger import CSVLogger
 from dataset import labels
+import os
 
 weight_decay = 0.01
 enable_DRO = True
@@ -28,6 +29,8 @@ def log_row(logger, epoch, group_loss, group_acc, adv_probs, group_total):
 
 
 def main():
+    os.makedirs('./logs', exist_ok=True)
+
     train_dataset, val_dataset, test_dataset = load_dataset()
     train_data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
     val_data_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
@@ -58,8 +61,8 @@ def main():
         if (n + 1) % 10 == 0:
             train_logger.flush()
             val_logger.flush()
-            torch.save(model.state_dict(), f'./checkpoints/model_epoch_{n+1}.pth')
-            print(f"Modèle sauvegardé : ./checkpoints/model_epoch_{n+1}.pth")
+            torch.save(model.state_dict(), f'./logs/model_epoch_{n+1}.pth')
+            print(f"Modèle sauvegardé : ./logs/model_epoch_{n+1}.pth")
 
     train_logger.close()
     val_logger.close()
