@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from torch.optim import SGD
 from torchvision.models import resnet50
 import torch
+from dro import GroupDROLoss
 
 weight_decay = 0.01
 enable_DRO = False
@@ -24,10 +25,12 @@ def main():
 
     optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=weight_decay)
 
+    dro_loss = GroupDROLoss(n_groups=4).to(device) if enable_DRO else None
+
     for n in range(n_epoch):
         print(f"\nEpoch [{n}]")
         print("Training:")
-        train(train_data_loader, model, optimizer, enable_DRO)
+        train(train_data_loader, model, optimizer, dro_loss)
         print("Validation:")
         validate(val_data_loader, model)
 

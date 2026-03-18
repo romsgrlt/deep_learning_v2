@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from tqdm import tqdm
-
+from dro import GroupDROLoss
 
 labels = ['landbird/land', 'landbird/water', 'waterbird/land', 'waterbird/water']
 
@@ -16,12 +16,12 @@ def eval_groups(logits, y, group):
     for group_idx in range(n_groups):
         mask = (group == group_idx)
         correct_per_group[group_idx] += (predicted_classes[mask] == y[mask]).sum().item()
-        total_per_group[group_idx]   += mask.sum().item()
+        total_per_group[group_idx] += mask.sum().item()
 
     return correct_per_group, total_per_group
 
 
-def run(loader, model, criterion, is_training, optimizer=None):
+def run(loader, model, criterion, is_training, loss_dro, optimizer=None):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.train() if is_training else model.eval()
 
@@ -32,12 +32,16 @@ def run(loader, model, criterion, is_training, optimizer=None):
 
     with torch.set_grad_enabled(is_training):
         for x, y, group in tqdm(loader):
-            x, y = x.to(device), y.to(device)
+            x, y, group = x.to(device), y.to(device), group.to(device)
 
             output = model(x)
-            loss = criterion(output, y)
+            per_sample_losses = criterion(output, y)
 
             if is_training:
+                if loss_dro is None:
+                    loss = per_sample_losses.mean()
+                else:
+                    loss = loss_dro.loss(per_sample_losses, group)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -53,13 +57,11 @@ def run(loader, model, criterion, is_training, optimizer=None):
         print(f"    Groupe {group_index} ({labels[group_index]}): acc={group_acc[group_index]:.3f}")
 
 
-def train(data_loader, model, optimizer, enable_dro):
-    if enable_dro:
-        print('not implemented yet')
-    else:
-        print("Training:")
-        run(data_loader, model, nn.CrossEntropyLoss(), True, optimizer)
+def train(data_loader, model, optimizer, loss_dro):
+    print("Training:")
+    run(data_loader, model, nn.CrossEntropyLoss(reduction='none'), True, loss_dro, optimizer)
 
 
 def validate(data_loader, model):
-    run(data_loader, model, nn.CrossEntropyLoss(), False)
+    print('Validate:')
+    run(data_loader, model, nn.CrossEntropyLoss(reduction='none'), False, None)
