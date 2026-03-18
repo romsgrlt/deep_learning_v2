@@ -58,8 +58,8 @@ def main():
         if (n + 1) % 10 == 0:
             train_logger.flush()
             val_logger.flush()
-            torch.save(model.state_dict(), f'./checkpoints/model_epoch_{n}.pth')
-            print(f"Modèle sauvegardé : ./checkpoints/model_epoch_{n}.pth")
+            torch.save(model.state_dict(), f'./checkpoints/model_epoch_{n+1}.pth')
+            print(f"Modèle sauvegardé : ./checkpoints/model_epoch_{n+1}.pth")
 
     train_logger.close()
     val_logger.close()
