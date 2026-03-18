@@ -58,6 +58,10 @@ def main():
         group_loss, group_acc, adv_probs, group_total = validate(val_data_loader, model)
         log_row(val_logger, n, group_loss, group_acc, adv_probs, group_total)
 
+        print("test:")
+        group_loss, group_acc, adv_probs, group_total = validate(test_dataset, model)
+        log_row(val_logger, n, group_loss, group_acc, adv_probs, group_total)
+
         if (n + 1) % 10 == 0:
             train_logger.flush()
             val_logger.flush()
